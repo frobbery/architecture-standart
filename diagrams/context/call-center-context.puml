@@ -1,0 +1,24 @@
+@startuml
+!include ../templates/C4_Context.puml
+
+title Standart Context Diagram
+
+top to bottom direction
+
+
+Person(callCenterManager, "Call center manager", "Call center manager of Standart bank")
+Person(externalCallCenterManager, "External call center manager", "External call center manager")
+
+System(sftpServer, "SFTP server", "Server for transferring deposit rate file")
+System(callCenter, "Call-center System", "System for call-center functionality")
+System(depositService, "Deposit service", "Microservice for operating with deposit rates and orders")
+
+System_Ext(externalCallCenter, "External call center system", "System for external call center operators")
+
+Rel(externalCallCenterManager, externalCallCenter, "Views deposit rates")
+Rel(depositService, sftpServer, "Puts deposit rate file")
+Rel(externalCallCenter, sftpServer, "Gets deposit rate file")
+Rel(callCenterManager, callCenter, "Views deposit rates")
+Rel(callCenter, depositService, "Gets common and individual deposit rates")
+
+@enduml
