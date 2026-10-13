@@ -1,0 +1,38 @@
+@startuml
+!include ../templates/C4_Context.puml
+
+title Standart Context Diagram
+
+top to bottom direction
+
+Person(user, "User", "User of the Standart banking system")
+Person(frontOfficeManager, "Front office manager", "Front office manager of Standart bank")
+Person(depositManager, "Deposit manager", "Deposit manager of Standart bank")
+Person(creditManager, "Credit manager", "Credit manager of Standart bank")
+Person(callCenterManager, "Call center manager", "Call center of Standart bank")
+
+System(internetBank, "Internet Bank", "Web application for bank functionality")
+System(abs, "ABS", "Automatized Banking system for core banking procedures")
+System(callCenter, "Call-center System", "System for call-center functionality")
+System(backOffice, "Backoffice System", "Web application for backoffice workers")
+System(depositService, "Deposit service", "Microservice for operating with deposit rates and orders")
+System(smsGateway, "SMS gateway", "Gateway for sending sms through telecom operator")
+
+System_Ext(telecomOperator, "Telecom Operator API", "External API of telecom operator")
+
+Rel(user, internetBank, "Uses bank for viewing deposit rates and creating deposit orders")
+Rel(internetBank, depositService, "Gets common and individual deposit rates, creates authorized/unauthorized orders")
+Rel(internetBank, abs, "Gets users accounts with balances")
+Rel(depositManager, backOffice, "Views authorised deposit orders and deposit rates, creates special deposit rates for individual users, closes deposit orders")
+Rel(backOffice, depositService, "Loads and views deposit rates, gets authorized deposit orders, closes deposit orders, gets and saves credit risk data for individual users, creates individual deposit rates")
+Rel(depositManager, abs, "Creates deposit")
+Rel(frontOfficeManager, backOffice, "Creates deposit orders")
+Rel(creditManager, backOffice, "Loads deposit rates file, creates risk data for individual users")
+Rel(backOffice, abs, "Gets users with account balance over certain amount")
+Rel(backOffice, depositService, "Loads and views deposit rates, gets authorized deposit orders, closes deposit orders, creates individual deposit rates")
+Rel(depositService, smsGateway, "Sends sms about deposit creation")
+Rel(smsGateway, telecomOperator, "Uses api")
+Rel(callCenterManager, callCenter, "Views and closes unauthorized deposit orders")
+Rel(callCenter, depositService, "Gets and closes unauthorized deposit orders")
+
+@enduml

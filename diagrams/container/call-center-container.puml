@@ -1,0 +1,31 @@
+@startuml
+!include ../templates/C4_Container.puml
+
+title Standart Container Diagram
+
+top to bottom direction
+
+Person(callCenterManager, "Call center manager", "Call center manager of Standart bank")
+Person(externalCallCenterManager, "External call center manager", "External call center manager")
+
+Container_Boundary(StandartSystem, "Standart Banking System") {
+  Container(sftpServer, "SFTP server", "SFTP", "Server for transferring deposit rate file")
+  Container(callCenterWeb, "Call-center Web-client", "React.js", "Acts as frontend for call-center managers")
+  Container(callCenterBack, "Call-center Application", "Java, Spring Boot", "Backend application for call-center system")
+  Container(depositService, "Deposit service", "ASP.NET MVC 4.5, .NET Framework 4.5", "Microservice for operating with deposit rates and orders")
+  ContainerDb(depositDatabase, "Deposit Database", "MS SQL", "Stores deposit orders, individual deposit rates and individual credit rick data")
+  Container(cache, "Deposit rates cache", "Guava Cache", "Local cache that stores deposit rates for a day")
+}
+
+System_Ext(externalCallCenter, "External call center system", "System for external call center operators")
+
+Rel(externalCallCenterManager, externalCallCenter, "Views deposit rates")
+Rel(depositService, sftpServer, "Puts deposit rate file", "SFTP, SSH")
+Rel(externalCallCenter, sftpServer, "Gets deposit rate file", "SFTP, SSH")
+Rel(callCenterManager, callCenterWeb, "Views deposit rates")
+Rel(callCenterWeb, callCenterBack, "Forwards requests", "JSON/HTTPS")
+Rel(callCenterBack, cache, "Checks and gets cached deposit rates")
+Rel(callCenterBack, depositService, "Gets common and individual deposit rates", "JSON/HTTPS")
+Rel(depositService, depositDatabase, "Reads individual deposit rates", "SQL/TCP")
+
+@enduml

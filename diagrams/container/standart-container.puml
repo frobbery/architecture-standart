@@ -1,0 +1,47 @@
+@startuml
+!include ../templates/C4_Container.puml
+
+title Standart Container Diagram
+
+top to bottom direction
+
+Person(user, "User", "User of the Standart banking system")
+Person(frontOfficeManager, "Front office manager", "Front office manager of Standart bank")
+Person(depositManager, "Deposit manager", "Deposit manager of Standart bank")
+Person(creditManager, "Credit manager", "Credit manager of Standart bank")
+Person(callCenterManager, "Call center manager", "Call center manager of Standart bank")
+
+Container_Boundary(StandartSystem, "Standart Banking System") {
+  Container(bankWebClient, "Internet Bank Web-client", "PHP, React.js", "Acts as frontend for user")
+  Container(internetBank, "Internet Bank",  "ASP.NET MVC 4.5,  .NET Framework 4.5", "Monolith server application for bank functionality")
+  Container(absClient, "ABS client", "Delphi", "Automatized Banking system client for core banking procedures")
+  ContainerDb(absDatabase, "ABS Database", "Oracle, PL-SQL", "Stores core banking data and executes procedures")
+  Container(callCenterWeb, "Call-center Web-client", "React.js", "Acts as frontend for call-center managers")
+  Container(callCenterBack, "Call-center Applications", "Java, Spring Boot", "Backend application for call-center system")
+  Container(backOfficeWeb, "Backoffice Web-client", "PHP, React.js", "Acts as frontend for bank workers")
+  Container(depositService, "Deposit service", "ASP.NET MVC 4.5, .NET Framework 4.5", "Microservice for operating with deposit rates and orders")
+  ContainerDb(depositDatabase, "Deposit Database", "MS SQL", "Stores deposit orders, individual deposit rates and individual credit rick data")
+  Container(smsGateway, "SMS gateway", "Not mentioned in TASK", "Gateway for sending sms through telecom operator")
+}
+
+System_Ext(telecomOperator, "Telecom Operator API", "External API of telecom operator")
+
+Rel(user, bankWebClient, "Views deposit rates and creates deposit orders")
+Rel(bankWebClient, internetBank, "Forwards user requests", "JSON/HTTPS")
+Rel(internetBank, depositService, "Gets common and individual deposit rates, creates authorized/unauthorized orders", "JSON/HTTPS")
+Rel(internetBank, absClient, "Gets users accounts with balances", "JSON/HTTPS")
+Rel(depositManager, backOfficeWeb, "Views authorised deposit orders and deposit rates, creates special deposit rates for individual users, closes deposit orders")
+Rel(backOfficeWeb, depositService, "Loads and views deposit rates, gets authorized deposit orders, closes deposit orders, gets and saves credit risk data for individual users, creates individual deposit rates", "JSON/HTTPS")
+Rel(depositManager, absClient, "Creates deposit")
+Rel(absClient, absDatabase, "Creates deposit, gets users accounts, get users with account balances over certain amount", "PL-SQL")
+Rel(frontOfficeManager, backOfficeWeb, "Creates deposit orders")
+Rel(creditManager, backOfficeWeb, "Loads deposit rates file, creates risk data for individual users")
+Rel(backOfficeWeb, absClient, "Gets users with account balance over certain amount", "JSON/HTTPS")
+Rel(depositService, smsGateway, "Sends sms about deposit creation", "JSON/HTTPS")
+Rel(depositService, depositDatabase, "Reads and saves individual rates, deposit orders, credit risk data", "SQL/TCP")
+Rel(smsGateway, telecomOperator, "Uses api", "JSON/HTTPS")
+Rel(callCenterManager, callCenterWeb, "Views and closes unauthorized deposit orders")
+Rel(callCenterWeb, callCenterBack, "Forwards requests", "JSON/HTTPS")
+Rel(callCenterBack, depositService, "Gets and closes unauthorized deposit orders", "JSON/HTTPS")
+
+@enduml
